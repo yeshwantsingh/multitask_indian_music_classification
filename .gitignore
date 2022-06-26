@@ -20,6 +20,9 @@ lib64/
 parts/
 sdist/
 var/
+notebooks/
+ref_papers/
+
 *.egg-info/
 .installed.cfg
 *.egg
@@ -85,6 +88,8 @@ target/
 # vim
 *.swp
 *.swo
+*.pdf
 
 # Mypy cache
 .mypy_cache/
+

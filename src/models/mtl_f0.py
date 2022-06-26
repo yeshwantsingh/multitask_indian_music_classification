@@ -1,66 +1,69 @@
 import tensorflow as tf
 
 
-def get_model():
-    input_shape = (None, None, 5)
+def get_multi_f0_model(input_shape, outputs):
+    outputs = [17, 16, 1, 1]
     inputs = tf.keras.Input(shape=input_shape)
 
-    y0 = tf.keras.layers.BatchNormalization()(inputs)
+    reshaped_inputs = tf.expand_dims(inputs, -1)
 
-    y1_pitch = tf.keras.layers.Conv2D(
-        128, (5, 5), padding='same', activation='relu', name='pitch_layer1')(y0)
+    y0 = tf.keras.layers.BatchNormalization()(reshaped_inputs)
+
+    y1_pitch = tf.keras.layers.Conv2D(128, 5, padding='same', activation='relu')(y0)
     y1a_pitch = tf.keras.layers.BatchNormalization()(y1_pitch)
-    y2_pitch = tf.keras.layers.Conv2D(
-        32, (5, 5), padding='same', activation='relu', name='pitch_layer2')(y1a_pitch)
+
+    y2_pitch = tf.keras.layers.Conv2D(32, 5, padding='same', activation='relu')(y1a_pitch)
     y2a_pitch = tf.keras.layers.BatchNormalization()(y2_pitch)
-    y3_pitch = tf.keras.layers.Conv2D(32, (3, 3), padding='same', activation='relu', name='smoothy2')(y2a_pitch)
+
+    y3_pitch = tf.keras.layers.Conv2D(32, 3, padding='same', activation='relu')(y2a_pitch)
     y3a_pitch = tf.keras.layers.BatchNormalization()(y3_pitch)
-    y4_pitch = tf.keras.layers.Conv2D(8, (70, 3), padding='same', activation='relu', name='distribute')(y3a_pitch)
+
+    y4_pitch = tf.keras.layers.Conv2D(8, (70, 3), padding='same', activation='relu')(y3a_pitch)
     y4a_pitch = tf.keras.layers.BatchNormalization()(y4_pitch)
 
-    y1_timbre = tf.keras.layers.Conv2D(
-        512, (1, 1), padding='same', activation='relu', name='timbre_layer1')(y0)
+    y_multif0 = tf.keras.layers.Conv2D(1, 1, padding='same', activation='relu', name='y_multif0')(y4a_pitch)
+    y_multif0 = tf.keras.layers.MaxPool2D(2)(y_multif0)
+
+    output1 = tf.keras.layers.Flatten()(y_multif0)
+    output1 = tf.keras.layers.Dense(outputs[0], name="output1")(output1)
+
+    y1_timbre = tf.keras.layers.Conv2D(256, 1, padding='same', activation='relu')(y0)
     y1a_timbre = tf.keras.layers.BatchNormalization()(y1_timbre)
-    # y2_timbre = Conv2D(
-    #     32, (5, 5), padding='same', activation='relu', name='timbre_layer2')(y1a_timbre)
-    # y2a_timbre = BatchNormalization()(y2_timbre)
+    y1a_timbre = tf.keras.layers.MaxPool2D(2)(y1a_timbre)
 
-    y_multif0 = tf.keras.layers.Conv2D(
-        1, (1, 1), padding='same', activation='sigmoid', name='multif0_presqueeze')(y4a_pitch)
-    multif0 = tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=3), name='multif0')(y_multif0)
+    y2_timbre = tf.keras.layers.Conv2D(32, 5, padding='same', activation='relu')(y1a_timbre)
+    y2a_timbre = tf.keras.layers.BatchNormalization()(y2_timbre)
 
-    y_concat = tf.keras.layers.Concatenate(name='timbre_and_pitch')([y_multif0, y1a_timbre])
+    y_concat = tf.keras.layers.Concatenate()([y_multif0, y1a_timbre, y2a_timbre])
 
-    y_mel_feat = tf.keras.layers.Conv2D(
-        32, (5, 5), padding='same', activation='relu', name='melody_filters')(y_concat)
-    y_mel_feat2 = tf.keras.layers.Conv2D(
-        1, (360, 1), padding='same', activation='relu', name='melody_filters2')(y_mel_feat)
-    y_bass_feat = tf.keras.layers.Conv2D(
-        32, (5, 5), padding='same', activation='relu', name='bass_filters')(y_concat)
-    y_bass_feat2 = tf.keras.layers.Conv2D(
-        1, (360, 1), padding='same', activation='relu', name='bass_filters2')(y_bass_feat)
-    y_piano_feat = tf.keras.layers.Conv2D(
-        32, (5, 5), padding='same', activation='relu', name='piano_filters')(y_concat)
-    y_piano_feat2 = tf.keras.layers.Conv2D(
-        1, (360, 1), padding='same', activation='relu', name='piano_filters2')(y_piano_feat)
+    # Melody filters
+    y_mel_feat = tf.keras.layers.Conv2D(32, 5, padding='same', activation='relu')(y_concat)
+    y_mel_feat2 = tf.keras.layers.Conv2D(1, (180, 1), padding='same', activation='relu')(y_mel_feat)
 
-    y_melody = tf.keras.layers.Conv2D(
-        1, (1, 1), padding='same', activation='sigmoid', name='melody_presqueeze')(y_mel_feat2)
-    melody = tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=3), name='melody')(y_melody)
+    # Bass filters
+    y_bass_feat = tf.keras.layers.Conv2D(32, (5, 5), padding='same', activation='relu')(y_concat)
+    y_bass_feat2 = tf.keras.layers.Conv2D(1, (180, 1), padding='same', activation='relu')(y_bass_feat)
 
-    y_bass = tf.keras.layers.Conv2D(
-        1, (1, 1), padding='same', activation='sigmoid', name='bass_presqueeze')(y_bass_feat2)
-    bass = tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=3), name='bass')(y_bass)
+    # piano filters
+    y_piano_feat = tf.keras.layers.Conv2D(32, 5, padding='same', activation='relu')(y_concat)
+    y_piano_feat2 = tf.keras.layers.Conv2D(1, (180, 1), padding='same', activation='relu')(y_piano_feat)
 
-    y_piano = tf.keras.layers.Conv2D(
-        1, (1, 1), padding='same', activation='sigmoid', name='piano_presqueeze')(y_piano_feat2)
-    piano = tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=3), name='piano')(y_piano)
+    # Melody presqueeze
+    y_melody = tf.keras.layers.Conv2D(1, 1, padding='same', activation='relu', name='y_melody')(y_mel_feat2)
+    y_melody = tf.keras.layers.MaxPool2D(2)(y_melody)
+    y_melody = tf.keras.layers.Flatten()(y_melody)
 
-    model =  tf.keras.Model(inputs=inputs, outputs=[multif0, melody, bass, piano])
-    model.compile(optimizer='adam', loss='mse')
+    output2 = tf.keras.layers.Dense(outputs[1], name='output2')(y_melody)
 
-    return model
+    # Bass presqueeze
+    y_bass = tf.keras.layers.Conv2D(1, 1, padding='same', activation='relu', name='y_bass')(y_bass_feat2)
+    y_bass = tf.keras.layers.MaxPool2D(2)(y_bass)
+    y_bass = tf.keras.layers.Flatten()(y_bass)
+    output3 = tf.keras.layers.Dense(outputs[2], name="output3")(y_bass)
 
-if __name__ == '__main__':
-    model = get_model()
-    model.summary()
+    # Piano presqueeze
+    y_piano = tf.keras.layers.Conv2D(1, 1, padding='same', activation='relu', name='y_piano')(y_piano_feat2)
+    y_piano = tf.keras.layers.Flatten()(y_piano)
+    output4 = tf.keras.layers.Dense(outputs[3], name="output4")(y_piano)
+
+    return tf.keras.Model(inputs=inputs, outputs=[output1, output2, output3, output4])

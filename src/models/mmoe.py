@@ -5,7 +5,7 @@ Copyright (c) 2018 Drawbridge, Inc
 Licensed under the MIT License (see LICENSE for details)
 Written by Alvin Deng
 """
-
+import os
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras import activations, initializers, regularizers, constraints
@@ -241,9 +241,9 @@ class MMoE(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-def get_model(num_features):
+def get_mmoe_model(shape):
     # Set up the input layer
-    input_layer = tf.keras.Input(shape=(num_features,))
+    input_layer = tf.keras.Input(shape=shape)
 
     # Set up MMoE layer
     mmoe_layers = MMoE(
@@ -283,5 +283,5 @@ def get_model(num_features):
 
 
 if __name__ == '__main__':
-    model = get_model(100)
+    model = get_mmoe_model((128, 130))
     model.summary()
