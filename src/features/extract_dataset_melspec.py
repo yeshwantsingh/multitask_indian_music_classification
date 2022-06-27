@@ -1,5 +1,4 @@
 import warnings
-import pandas as pd
 
 from feature_utils import process_genres, get_dataset_info
 

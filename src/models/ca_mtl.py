@@ -28,7 +28,7 @@ def get_ca_mtl_model(input_shape, output_nodes):
     x3 = attention_block(x)
 
     # x4 = tf.keras.layers.Attention()([x1, x2])
-    # x5 = tf.keras.layers.Attention()([x1, x2])
+    # x5 = tf.keras.layers.Attention()([x1, x3])
     # x6 = tf.keras.layers.Attention()([x2, x3])
 
     x = tf.keras.layers.Concatenate()([x1, x2, x3])

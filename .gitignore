@@ -22,6 +22,8 @@ sdist/
 var/
 notebooks/
 ref_papers/
+reports/
+saved models/
 
 *.egg-info/
 .installed.cfg
@@ -92,4 +94,5 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
 

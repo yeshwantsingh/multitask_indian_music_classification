@@ -1,6 +1,5 @@
 import os
 import tensorflow as tf
-import numpy as np
 
 from data.load_data import get_dataset
 from data.split_data import train_val_split
@@ -116,7 +115,7 @@ def prepare_regional_ds(model_name, path, dataset_dict, train_percentage, val_pe
     # y_train = np.dstack((y1_train, y2_train, y3_train, y4_train))
     # y_val = np.dstack((y1_val, y2_val, y3_val, y4_val))
     # y_test = np.dstack((y1_test, y2_test, y3_test, y4_test))
-    return (X_train, y2_train), (X_test, y2_test)
+    return (X_train, y5_train), (X_test, y5_test)
 
 
 def _compile_model(model, dataset_name, model_name):
@@ -133,7 +132,7 @@ def _compile_model(model, dataset_name, model_name):
     elif dataset_name == 'folk':
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
-                          'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output1': tf.keras.losses.MeanSquaredError(),
                           # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                           # 'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
                           # 'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
