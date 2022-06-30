@@ -9,7 +9,7 @@ import tensorflow as tf
 warnings.simplefilter('ignore')
 
 from train_utils import prepare_dataset, \
-    plot_model_diagram, compile_train_for_regional, \
+    plot_model_diagram, compile_train_model, \
     setup_gpu_state, get_train_info, get_model_func
 
 from data.make_dataset import get_dataset_info
@@ -36,7 +36,7 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size):
 
     plot_model_diagram(model, model_plot_path)
 
-    compile_train_for_regional(model, dataset_nick_name, model_name,
+    compile_train_model(model, dataset_nick_name, model_name,
                                train_ds, val_ds, model_save_path,
                                tensorboard_logs_path, epochs)
     # model = tf.keras.models.load_model(model_save_path)
