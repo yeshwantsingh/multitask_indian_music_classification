@@ -1,0 +1,50 @@
+A Deep Neural Network for Audio Classification with a Classifier Attention Mechanism 
+A Novel Multi-Task Learning Method for Symbolic Music Emotion Recognition 
+An Overview of Multi-Task Learning in Deep Neural Networks 
+An overview of multi-task learning 
+A Survey on Multi-Task Learning 
+Attention-augmented End-to-end Multi-task Learning for Emotion Prediction from Speech 
+Clean vs. Overlapped Speech-Music Detection Using Harmonic-Percussive Features and Multi-Task Learning 
+Conditional Neural Processes 
+Cross-Corpus Acoustic Emotion Recognition with Multi-Task Learning Seeking Common Ground While Preserving Differences 
+Cross-stitch Networks for Multi-task Learning 
+Data-Efficient Hierarchical Reinforcement Learning 
+Deep Dynamics Models for Learning Dexterous Manipulation 
+DeepGTTM-III Multi-taskLearning 
+DIVERSITY IS ALL YOU NEED : LEARNING SKILLS WITHOUT A REWARD FUNCTION 
+DYNAMICS -AWARE UNSUPERVISED DISCOVERY SKILLS 
+Efficient Off-Policy Meta-Reinforcement Learning via Probabilistic Context Variables 
+FUNCTIONAL HARMONY RECOGNITION OF SYMBOLIC MUSIC DATA WITH MULTI-TASK RECURRENT NEURAL NETWORKS 
+Hindsight Experience Replay 
+ismir2021-multi-task-representations 
+LABEL - EFFICIENT AUDIO CLASSIFICATION THROUGH MULTITASK LEARNING AND SELF - SUPERVISION 
+Language-Sensitive Music Emotion Recognition Models are We Really There Yet 
+Learning Multiple Tasks with Multilinear Relationship Networks 
+Matching Networks for One Shot Learning 
+Meta-Learning A Survey 
+Meta-Learning in Neural Networks A Survey 
+META -LEARNING PROBABILISTIC INFERENCE FOR PREDICTION 
+Meta-Learning with Differentiable Convex Optimization 
+META -LEARNING WITHOUT MEMORIZATION 
+Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks 
+Multi-Modal Meta Multi-Task Learning for Social Media Rumor Detection 
+Multi-Task Learning as Multi-Objective Optimization 
+Multitask Learning for Fundamental Frequency Estimation in Music 
+Multi-Task Learning for Interpretable Weakly Labelled Sound Event Detection 
+Multi-Task Learning for Speaker Verification and Voice Trigger Detection 
+MULTI-TASK LEARNING OF TEMPO AND BEAT LEARNING ONE TO IMPROVE THE OTHER 
+Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics 
+Multi-task learning using variational auto-encoder for sentiment classiﬁcation 
+MULTI-TASK LEARNING WITH DEEP NEURAL NETWORKS A survey 
+Multi-Task Self-Supervised Pre-Training for Music Classification 
+One-shot Learning with Memory-Augmented Neural Networks 
+Prototypical Networks for Few-shot Learning 
+Reinforcement Learning and Control as Probabilistic Inference Tutorial and Review 
+Sharing to learn and learning to share Fitting together 
+Spectrogram based multi-task audio classification 
+Speech Enhancement Aided End-To-End Multi-Task Learning for Voice Activity Detection 
+Supervised Chorus Detection for Popular Music Using Convolutional Neural Network and Multi-Task Learning 
+TOWARDS MULTI-INSTRUMENT DRUM TRANSCRIPTION 
+Universal Language Model Fine-tuning for Text Classification 
+VARI BAD: A VERY GOOD METHOD FOR BAYES - ADAPTIVE DEEP RL VIA META - LEARNING 
+Visual Foresight: Model-Based Deep Reinforcement Learning for Vision-Based Robotic Control 

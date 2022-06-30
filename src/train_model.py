@@ -1,15 +1,18 @@
 import os
+import warnings
+
 import numpy as np
 import tensorflow as tf
-import warnings
+
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 warnings.simplefilter('ignore')
 
-from train_utils import prepare_regional_ds, \
+from train_utils import prepare_dataset, \
     plot_model_diagram, compile_train_for_regional, \
-    setup_gpu_state, get_train_info, get_model_func, get_callbacks
+    setup_gpu_state, get_train_info, get_model_func
 
-from features.feature_utils import get_dataset_info
+from data.make_dataset import get_dataset_info
 
 os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 
@@ -21,24 +24,20 @@ np.random.seed(seed)
 setup_gpu_state()
 
 
-def main(dataset_nick_name, model_name, task, epochs, train_split, val_split, batch_size):
-    input_shape = (128, 130)
-
+def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size):
+    # input_shape = (128, 130)
+    input_shape = (259, 256)
     model_save_path, tensorboard_logs_path, model_plot_path = get_train_info(dataset_nick_name, model_name, task)
 
-    path, _, _, dataset_dict, outputs = get_dataset_info(dataset_nick_name)
-    (X_train, y_train), (X_test, y_test) = prepare_regional_ds(model_name, path, dataset_dict, train_split, val_split,
-                                                               batch_size)
+    dataset_path, outputs = get_dataset_info(dataset_nick_name)
+    train_ds, val_ds = prepare_dataset(dataset_path, dataset_nick_name, val_split, batch_size)
     model = get_model_func(model_name)
-    model = model(input_shape, outputs[4:5])
+    model = model(input_shape, outputs[0:1])
 
     plot_model_diagram(model, model_plot_path)
 
-    train_ds = (X_train, y_train)
-    # test_ds = (X_test, y_test)
-
     compile_train_for_regional(model, dataset_nick_name, model_name,
-                               train_ds, val_split / 100, batch_size, model_save_path,
+                               train_ds, val_ds, model_save_path,
                                tensorboard_logs_path, epochs)
     # model = tf.keras.models.load_model(model_save_path)
     # model.fit(x=X_train, y=y_train, validation_data=(X_val, y_val), epochs=epochs, batch_size=batch_size,
@@ -50,8 +49,8 @@ def main(dataset_nick_name, model_name, task, epochs, train_split, val_split, ba
 if __name__ == '__main__':
     dataset = 'folk'
     model_name = 'baseline'
-    task = 'num_artists'
+    task = 'genre'
     epochs = 100
-    batch_size = 128
-    train_split, val_split = 80, 20
-    main(dataset, model_name, task, epochs, train_split, val_split, batch_size)
+    batch_size = 256
+    val_split = .2
+    main(dataset, model_name, task, epochs, val_split, batch_size)
