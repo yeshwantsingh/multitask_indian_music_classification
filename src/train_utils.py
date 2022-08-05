@@ -115,6 +115,13 @@ def _compile_model(model, dataset_name, model_name):
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output6': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output7': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output8': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                       },
                       metrics=['accuracy'])
     else:

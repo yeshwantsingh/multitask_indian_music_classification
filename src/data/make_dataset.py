@@ -66,16 +66,16 @@ def get_hindustani_label(file_path):
         input=file_path,
         sep=os.path.sep)
 
-    label1 = int(tf.strings.split(input=parts[7], sep='_')[1])  # Raag_id
-    label2 = int(tf.strings.split(input=parts[8], sep='_')[1])  # Swaras_set_id
-    label3 = int(tf.strings.split(input=parts[8], sep='_')[2])  # jati_id
-    label4 = int(tf.strings.split(input=parts[8], sep='_')[2])  # thaat_id
-    label5 = int(tf.strings.split(input=parts[8], sep='_')[2])  # vadi_id
-    label6 = int(tf.strings.split(input=parts[8], sep='_')[2])  # samvadi_id
-    label7 = int(tf.strings.split(input=parts[8], sep='_')[3])  # aaroh_set_id
-    label8 = int(tf.strings.split(input=parts[8], sep='_')[3])  # avroh_set_id
+    label1 = int(tf.strings.split(input=parts[-2], sep='_')[1])  # Raag_id
+    label2 = int(tf.strings.split(input=parts[-2], sep='_')[2])  # Swaras_set_id
+    label3 = int(tf.strings.split(input=parts[-2], sep='_')[3])  # jati_id
+    label4 = int(tf.strings.split(input=parts[-2], sep='_')[4])  # thaat_id
+    label5 = int(tf.strings.split(input=parts[-2], sep='_')[5])  # vadi_id
+    label6 = int(tf.strings.split(input=parts[-2], sep='_')[6])  # samvadi_id
+    label7 = int(tf.strings.split(input=parts[-2], sep='_')[7])  # aaroh_set_id
+    label8 = int(tf.strings.split(input=parts[-2], sep='_')[8])  # avroh_set_id
 
-    return label1  # , label2, label3, label4, label5
+    return label1, label2, label3, label4, label5, label6, label7, label8
 
 
 def get_folk_label(file_path):
@@ -118,10 +118,10 @@ def get_semi_classical_label(file_path):
 
 
 def get_waveform_and_label(file_path):
-    label = get_folk_label(file_path)
+    label = get_hindustani_label(file_path)
     waveform = get_waveform(file_path)
-    labels = tf.repeat(label, repeats=tf.shape(waveform)[0])
-    # labels = tf.tile(tf.expand_dims(label, axis=0), [tf.shape(waveform)[0], 1])
+    # labels = tf.repeat(label, repeats=tf.shape(waveform)[0])
+    labels = tf.tile(tf.expand_dims(label, axis=0), [tf.shape(waveform)[0], 1])
     return waveform, labels
 
 
@@ -139,6 +139,10 @@ def get_mel_spec(spec):
         mel_spectrogram, top_db=80)
 
 
+def get_labels(y):
+    return y[0], y[1], y[2], y[3], y[4], y[5], y[6], y[7]
+
+
 def make_dataset_ds(filenames, batch_size):
     files_ds = tf.data.Dataset.from_tensor_slices(filenames)
 
@@ -148,8 +152,7 @@ def make_dataset_ds(filenames, batch_size):
           .flat_map(lambda x, y: tf.data.Dataset.from_tensor_slices((x, y)))
           .map(map_func=lambda x, y: (get_spectrogram(x), y), num_parallel_calls=AUTOTUNE)
           .map(map_func=lambda x, y: (get_mel_spec(x), y), num_parallel_calls=AUTOTUNE)
-          .cache()
-          .shuffle(1024)
+          .map(map_func=lambda x, y: (x, get_labels(y)), num_parallel_calls=AUTOTUNE)
           .batch(batch_size)
           .prefetch(AUTOTUNE)
           )
