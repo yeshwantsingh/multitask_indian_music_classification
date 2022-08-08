@@ -67,10 +67,10 @@ def get_model_func(model_name):
     return model_dict[model_name]
 
 
-def get_train_info(dataset_name, model_name, task):
-    model_save_path = '/media/B/multitask_indian_music_classification/saved models/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.h5'
-    tensorboard_logs_path = '/media/B/multitask_indian_music_classification/reports/visualization/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '/logs'
-    model_plot_path = '/media/B/multitask_indian_music_classification/reports/figures/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.pdf'
+def get_train_info(dataset_name, model_name, task, base_path):
+    model_save_path = base_path + 'saved models/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.h5'
+    tensorboard_logs_path = base_path + 'reports/visualization/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '/logs'
+    model_plot_path = base_path + 'reports/figures/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.pdf'
 
     return model_save_path, tensorboard_logs_path, model_plot_path
 
@@ -95,20 +95,20 @@ def _compile_model(model, dataset_name, model_name):
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          # 'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          # 'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          # 'output5': tf.keras.losses.MeanSquaredError(),
+                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          'output5': tf.keras.losses.MeanSquaredError(),
                       },
                       metrics=['accuracy'])
     elif dataset_name == 'folk':
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          # 'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          # 'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          # 'output5': tf.keras.losses.MeanSquaredError(),
+                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          'output5': tf.keras.losses.MeanSquaredError(),
                       },
                       metrics=['accuracy'])
     elif dataset_name == 'hindustani':
@@ -128,6 +128,11 @@ def _compile_model(model, dataset_name, model_name):
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          'output6': tf.keras.losses.BinaryCrossentropy(from_logits=True),
                       },
                       metrics=['accuracy'])
 
@@ -138,4 +143,4 @@ def compile_train_model(model, dataset_name, model_name, train_ds, val_ds,
     return model.fit(train_ds,
                      validation_data=val_ds,
                      epochs=epochs,
-                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_accuracy'))
+                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_output1_accuracy'))

@@ -5,34 +5,32 @@ import tensorflow_io as tfio
 
 AUTOTUNE = tf.data.AUTOTUNE
 
-datasets_path = '/media/B/multitask_indian_music_classification/data/raw/'
 
-
-def get_dataset_info(dataset_nick_name):
+def get_dataset_info(base_path, dataset_nick_name):
     path, dataset, outputs = None, None, None
     if dataset_nick_name == 'carnatic':
         dataset = 'Indian Carnatic Classical Music'
-        path = datasets_path + dataset
+        path = base_path + 'data/raw/' + dataset
         outputs = [40, 21, 12, 33, 29, 1]
 
     elif dataset_nick_name == 'hindustani':
         dataset = 'Indian Hindustani Classical Music'
-        path = datasets_path + dataset
+        path = base_path + 'data/raw/' + dataset
         outputs = [30, 23, 7, 10, 7, 6, 30, 30]
 
     elif dataset_nick_name == 'regional':
         dataset = 'Indian Regional Music'
-        path = datasets_path + '/' + dataset
+        path = base_path + 'data/raw/' + dataset
         outputs = [17, 68, 1, 1, 1]
 
     elif dataset_nick_name == 'folk':
         dataset = 'Indian Folk Music'
-        path = datasets_path + dataset
+        path = base_path + 'data/raw/' + dataset
         outputs = [15, 12, 126, 1, 1]
 
     elif dataset_nick_name == 'semi-classical':
         dataset = 'Indian Semi Classical Music'
-        path = datasets_path + dataset
+        path = base_path + 'data/raw/' + dataset
         outputs = [9, 49, 1, 1]
     return path, outputs
 
