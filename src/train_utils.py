@@ -24,15 +24,15 @@ def plot_model_diagram(model, path):
 
 def get_callbacks(model_save_path, tensorboard_logs_path, monitor):
     return [
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=model_save_path,
-            monitor=monitor,
-            verbose=2,
-            save_best_only=True,
-            save_weights_only=False,
-            mode='auto',
-            save_freq='epoch',
-        ),
+        # tf.keras.callbacks.ModelCheckpoint(
+        #     filepath=model_save_path,
+        #     monitor=monitor,
+        #     verbose=2,
+        #     save_best_only=True,
+        #     save_weights_only=False,
+        #     mode='auto',
+        #     save_freq='epoch',
+        # ),
 
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor=monitor,
@@ -68,7 +68,7 @@ def get_model_func(model_name):
 
 
 def get_train_info(dataset_name, model_name, task, base_path):
-    model_save_path = base_path + 'saved models/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.h5'
+    model_save_path = base_path + 'saved models/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '/{epoch:02d}.h5'
     tensorboard_logs_path = base_path + 'reports/visualization/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '/logs'
     model_plot_path = base_path + 'reports/figures/' + dataset_name + '/' + model_name + '/' + model_name + '_' + task + '.pdf'
 

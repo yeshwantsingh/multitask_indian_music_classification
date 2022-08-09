@@ -4,13 +4,20 @@ tf.keras.backend.set_floatx('float16')
 
 
 class CrossStitch(tf.keras.layers.Layer):
-    def __init__(self, shape):
+    def __init__(self, inputs_shape):
         super(CrossStitch, self).__init__()
-        self.shape = shape
-        self.idx_mat = tf.Variable(initial_value=tf.keras.initializers.Identity()(shape=(shape, shape)), trainable=True)
+        self.inputs_shape = inputs_shape
+        self.idx_mat = tf.Variable(initial_value=tf.keras.initializers.Identity()(shape=(inputs_shape, inputs_shape)))
 
     def call(self, inputs):
         return tf.matmul(inputs, self.idx_mat)
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "inputs_shape": self.inputs_shape,
+        })
+        return config
 
 
 def apply_cross_stitch(inputs):
@@ -18,11 +25,11 @@ def apply_cross_stitch(inputs):
     input_concat = tf.concat(input_reshaped, axis=1)
 
     # # initialize with identity matrix
-    cross_stitch = tf.Variable(
-        initial_value=tf.keras.initializers.Identity()(shape=(input_concat.shape[1], input_concat.shape[1])))
-    output = tf.matmul(input_concat, cross_stitch)
+    # cross_stitch = tf.Variable(
+    #     initial_value=tf.keras.initializers.Identity()(shape=(input_concat.shape[1], input_concat.shape[1])))
+    # output = tf.matmul(input_concat, cross_stitch)
 
-    # output = CrossStitch(input_concat.shape[1])(input_concat)
+    output = CrossStitch(input_concat.shape[1])(input_concat)
 
     # need to call .value to convert Dimension objects to normal value
     input_shape = [list(-1 if s is None else s for s in input.shape) for input in inputs]
@@ -41,7 +48,7 @@ def get_cross_stitch_network(input_shape, outputs):
     x = tf.keras.layers.Reshape((input_shape[0], input_shape[1], 1))(inputs)
     x = tf.keras.layers.Resizing(28, 28)(x)
 
-    conv1 = [tf.keras.layers.Conv2D(32, 3, activation='relu')(x) for _ in range(len(outputs))]
+    conv1 = [tf.keras.layers.Conv2D(16, 3, activation='relu')(x) for _ in range(len(outputs))]
     pool1 = [tf.keras.layers.MaxPool2D(2)(conv) for conv in conv1]
 
     if cross_stitch_enabled:
@@ -59,7 +66,7 @@ def get_cross_stitch_network(input_shape, outputs):
         stitch_pool2 = pool2
 
     flatten = [tf.keras.layers.Flatten()(stitch_pool) for stitch_pool in stitch_pool2]
-    fc_3 = [tf.keras.layers.Dense(1024)(_flatten) for _flatten in flatten]
+    fc_3 = [tf.keras.layers.Dense(128)(_flatten) for _flatten in flatten]
 
     if cross_stitch_enabled:
         stitch_fc_3 = apply_cross_stitch(fc_3)
