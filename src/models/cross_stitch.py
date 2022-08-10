@@ -45,7 +45,7 @@ def get_cross_stitch_network(input_shape, outputs):
     cross_stitch_enabled = True
 
     inputs = tf.keras.layers.Input(shape=input_shape)
-    x = tf.keras.layers.Reshape((input_shape[0], input_shape[1], 1))(inputs)
+    x = tf.expand_dims(inputs, -1)
     x = tf.keras.layers.Resizing(28, 28)(x)
 
     conv1 = [tf.keras.layers.Conv2D(16, 3, activation='relu')(x) for _ in range(len(outputs))]

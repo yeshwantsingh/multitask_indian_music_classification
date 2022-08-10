@@ -46,7 +46,6 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, bas
 
     plot_model_diagram(model, model_plot_path)
 
-    print(model_save_path)
     compile_train_model(model, dataset_nick_name, model_name,
                         train_ds, val_ds, model_save_path,
                         tensorboard_logs_path, epochs)
@@ -54,7 +53,7 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, bas
 
 if __name__ == '__main__':
     dataset = 'hindustani'
-    model_name = 'cross_stitch'
+    model_name = 'mrn'
     task = 'all'
     base_path = '/media/B/multitask_indian_music_classification/'
     epochs = 100
