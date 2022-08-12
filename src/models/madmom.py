@@ -1,9 +1,9 @@
 import tensorflow as tf
 
 
-def getTCN(input_layer):
-    x1 = tf.keras.layers.Conv1D(16, 4, padding="same", activation='relu')(input_layer)
-    x2 = tf.keras.layers.Conv1D(16, 4, padding="same", activation='relu', dilation_rate=2)(input_layer)
+def getTCN(inputs):
+    x1 = tf.keras.layers.Conv1D(16, 4, padding="same", activation='relu')(inputs)
+    x2 = tf.keras.layers.Conv1D(16, 4, padding="same", activation='relu', dilation_rate=2)(inputs)
     x2 = tf.keras.layers.ELU(alpha=0.8)(x2)
     x2 = tf.keras.layers.SpatialDropout1D(rate=0.3)(x2)
     x2 = tf.keras.layers.Conv1D(16, 4, padding="same", activation='relu')(x2)
@@ -13,42 +13,35 @@ def getTCN(input_layer):
     return out
 
 
+def aggregation_block(inputs):
+    x = tf.keras.layers.Add()(inputs)
+    x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    x = tf.keras.layers.Flatten()(x)
+    x = tf.keras.layers.Dropout(rate=0.4)(x)
+    x = tf.keras.layers.Dense(128)(x)
+    return x
+
+
 def get_madmom_model(input_shape, outputs):
-    outputs = [17, 16, 1, 1]
     inputs = tf.keras.Input(shape=input_shape)
 
-    tcn1 = getTCN(inputs)
-    tcn2 = getTCN(tcn1)
-    tcn3 = getTCN(tcn2)
-    tcn4 = getTCN(tcn3)
+    tcn = []
+    for _ in range(len(outputs)):
+        x = inputs
+        if len(tcn) == 0:
+            x = getTCN(inputs)
+        else:
+            x = getTCN(x)
+        tcn.append(x)
 
-    x1 = tf.keras.layers.Flatten()(tcn1)
-    x1 = tf.keras.layers.Dropout(rate=0.4)(x1)
-    x1 = tf.keras.layers.Dense(128)(x1)
-    output1 = tf.keras.layers.Dense(outputs[0], name="output1")(x1)
+    for i in range(1, len(outputs)+1):
+        if i == 1:
+            x = tf.keras.layers.Flatten()(tcn[0])
+            x = tf.keras.layers.Dropout(rate=0.4)(x)
+            x = tf.keras.layers.Dense(128)(x)
+        else:
+            x = aggregation_block(tcn[0:i])
+        outputs[i-1] = tf.keras.layers.Dense(outputs[i-1], name="output"+str(i))(x)
 
-    x2 = tf.keras.layers.Add()([tcn1, tcn2])
-    x2 = tf.keras.layers.GlobalAveragePooling1D()(x2)
-    x2 = tf.keras.layers.Flatten()(x2)
-    x2 = tf.keras.layers.Dropout(rate=0.4)(x2)
-    x2 = tf.keras.layers.Dense(128)(x2)
+    return tf.keras.Model(inputs, outputs)
 
-    output2 = tf.keras.layers.Dense(outputs[1], name="output2")(x2)
-
-    x3 = tf.keras.layers.Add()([tcn1, tcn2, tcn3])
-    x3 = tf.keras.layers.GlobalAveragePooling1D()(x3)
-    x3 = tf.keras.layers.Flatten()(x3)
-    x3 = tf.keras.layers.Dropout(rate=0.4)(x3)
-    x3 = tf.keras.layers.Dense(128)(x3)
-
-    output3 = tf.keras.layers.Dense(outputs[2], name="output3")(x3)
-
-    x4 = tf.keras.layers.Add()([tcn1, tcn2, tcn3, tcn4])
-    x4 = tf.keras.layers.GlobalAveragePooling1D()(x4)
-    x4 = tf.keras.layers.Flatten()(x4)
-    x4 = tf.keras.layers.Dropout(rate=0.4)(x4)
-    x4 = tf.keras.layers.Dense(128)(x4)
-
-    output4 = tf.keras.layers.Dense(outputs[3], name="output4")(x4)
-
-    return tf.keras.Model(inputs=inputs, outputs=[output1, output2, output3, output4])

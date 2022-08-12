@@ -53,7 +53,7 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, bas
 
 if __name__ == '__main__':
     dataset = 'hindustani'
-    model_name = 'mrn'
+    model_name = 'madmom'
     task = 'all'
     base_path = '/media/B/multitask_indian_music_classification/'
     epochs = 100
