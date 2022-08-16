@@ -10,6 +10,7 @@ flake8
 python-dotenv>=0.5.1
 tensorflow==2.9.1
 tensorflow-io
+tensorflow_addons
 numpy
 matplotlib
 seaborn

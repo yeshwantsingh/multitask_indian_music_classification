@@ -1,6 +1,7 @@
 import os
 
 import tensorflow as tf
+import tensorflow_addons as tfa
 from sklearn.model_selection import train_test_split
 
 from data.make_dataset import make_dataset_ds
@@ -24,16 +25,15 @@ def plot_model_diagram(model, path):
 
 def get_callbacks(model_save_path, tensorboard_logs_path, monitor):
     return [
-        # tf.keras.callbacks.ModelCheckpoint(
-        #     filepath=model_save_path,
-        #     monitor=monitor,
-        #     verbose=2,
-        #     save_best_only=True,
-        #     save_weights_only=False,
-        #     mode='auto',
-        #     save_freq='epoch',
-        # ),
-
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=model_save_path,
+            monitor=monitor,
+            verbose=2,
+            save_best_only=True,
+            save_weights_only=False,
+            mode='auto',
+            save_freq='epoch',
+        ),
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor=monitor,
             factor=0.1,
@@ -49,8 +49,8 @@ def get_callbacks(model_save_path, tensorboard_logs_path, monitor):
             histogram_freq=1,
             write_images=True,
             update_freq='epoch',
-        )
-
+        ),
+        # tfa.callbacks.TQDMProgressBar()
     ]
 
 
@@ -61,7 +61,7 @@ def get_model_func(model_name):
         'cross_stitch': cross_stitch.get_cross_stitch_network,
         'madmom': madmom.get_madmom_model,
         'mrn': mrn.get_mrn_model,
-        'mtl_f0': mtl_f0.get_multi_f0_model
+        'mtl_f0': mtl_f0.get_multi_f0_model,
     }
 
     return model_dict[model_name]
@@ -143,4 +143,5 @@ def compile_train_model(model, dataset_name, model_name, train_ds, val_ds,
     return model.fit(train_ds,
                      validation_data=val_ds,
                      epochs=epochs,
-                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_output1_accuracy'))
+                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_output1_accuracy')
+                     )

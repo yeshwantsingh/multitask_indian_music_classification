@@ -40,7 +40,7 @@ def get_waveform(file_path):
     waveform, sr = tf.audio.decode_wav(contents=audio_binary,
                                        desired_channels=1)
     waveform = tf.squeeze(waveform, axis=-1)
-    frames = tf.signal.frame(waveform, sr * 3, (sr * 3) // 2, pad_end=True)
+    frames = tf.signal.frame(waveform, sr * 3, sr // 2, pad_end=True)
     return frames
 
 

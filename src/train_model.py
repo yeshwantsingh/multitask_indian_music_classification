@@ -25,19 +25,26 @@ setup_gpu_state()
 snapshots_path = '/media/A/HindustaniSnapshots/All'
 
 
+def return_labels(x, y):
+    return x, (y[0], y[1], y[2], y[3])
+
+
 def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, base_path):
     input_shape = (259, 256)
     model_save_path, tensorboard_logs_path, model_plot_path = get_train_info(dataset_nick_name, model_name, task,
                                                                              base_path)
 
     dataset_path, outputs = get_dataset_info(base_path, dataset_nick_name)
-    # train_ds, val_ds = prepare_dataset(dataset_path, dataset_nick_name, val_split, batch_size)
+    train_ds, val_ds = prepare_dataset(dataset_path, dataset_nick_name, val_split, batch_size)
 
     # tf.data.experimental.save(train_ds, snapshots_path + '/Train')
     # tf.data.experimental.save(val_ds, snapshots_path + '/Val')
 
     train_ds = tf.data.experimental.load(snapshots_path + '/Train')
     val_ds = tf.data.experimental.load(snapshots_path + '/Val')
+
+    # train_ds = train_ds.map(map_func=return_labels, num_parallel_calls=tf.data.AUTOTUNE)
+    # val_ds = val_ds.map(map_func=return_labels, num_parallel_calls=tf.data.AUTOTUNE)
 
     model = get_model_func(model_name)
     model = model(input_shape, outputs)
@@ -53,7 +60,7 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, bas
 
 if __name__ == '__main__':
     dataset = 'hindustani'
-    model_name = 'madmom'
+    model_name = 'mtl_f0'
     task = 'all'
     base_path = '/media/B/multitask_indian_music_classification/'
     epochs = 100
