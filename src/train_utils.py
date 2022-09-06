@@ -2,6 +2,7 @@ import os
 
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+import tensorflow_addons as tfa
 
 from data.make_dataset import make_dataset_ds
 from models import baseline, ca_mtl, cross_stitch, madmom, mrn, mtl_f0
@@ -24,15 +25,15 @@ def plot_model_diagram(model, path):
 
 def get_callbacks(model_save_path, tensorboard_logs_path, monitor):
     return [
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=model_save_path,
-            monitor=monitor,
-            verbose=2,
-            save_best_only=True,
-            save_weights_only=False,
-            mode='auto',
-            save_freq='epoch',
-        ),
+        #tf.keras.callbacks.ModelCheckpoint(
+        #    filepath=model_save_path,
+        #    monitor=monitor,
+        #    verbose=2,
+        #    save_best_only=True,
+        #    save_weights_only=False,
+        #    mode='auto',
+        #    save_freq='epoch',
+        #),
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor=monitor,
             factor=0.1,
@@ -81,7 +82,11 @@ def prepare_dataset(path, dataset_name, val_percentage, batch_size):
         pattern = '/*/*/*.wav'
 
     filenames = tf.io.gfile.glob(path + pattern)
-    labels = [song.split('/')[7].split('_')[-1] for song in filenames]
+    if dataset_name in ['carnatic', 'hindustani']:
+        labels = [song.split('/')[-2].split('_')[1] for song in filenames]
+    else:
+        labels = [song.split('/')[-3].split('_')[1] for song in filenames]
+
     train_files, val_files, _, _ = train_test_split(filenames, labels, test_size=val_percentage, random_state=42)
 
     train_ds = make_dataset_ds(filenames, batch_size)
@@ -101,13 +106,13 @@ def _compile_model(model, dataset_name, model_name):
                       },
                       metrics=['accuracy'])
     elif dataset_name == 'folk':
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                          'output5': tf.keras.losses.MeanSquaredError(),
+                          # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output3': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          # 'output4': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          # 'output5': tf.keras.losses.MeanSquaredError(),
                       },
                       metrics=['accuracy'])
     elif dataset_name == 'semi_classical':
@@ -123,24 +128,24 @@ def _compile_model(model, dataset_name, model_name):
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output6': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output7': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output8': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output6': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output7': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output8': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                       },
                       metrics=['accuracy'])
     elif dataset_name == 'carnatic':
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                       loss={
                           'output1': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                          'output6': tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                          # 'output2': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output3': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output4': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output5': tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                          # 'output6': tf.keras.losses.BinaryCrossentropy(from_logits=True),
                       },
                       metrics=['accuracy'])
 
@@ -151,5 +156,5 @@ def compile_train_model(model, dataset_name, model_name, train_ds, val_ds,
     return model.fit(train_ds,
                      validation_data=val_ds,
                      epochs=epochs,
-                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_output1_accuracy')
+                     callbacks=get_callbacks(model_save_path, tensorboard_logs_path, monitor='val_accuracy')
                      )

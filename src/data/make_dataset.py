@@ -35,24 +35,15 @@ def get_dataset_info(base_path, dataset_nick_name):
     return path, outputs
 
 
-def get_waveform(file_path):
-    audio_binary = tf.io.read_file(file_path)
-    waveform, sr = tf.audio.decode_wav(contents=audio_binary,
-                                       desired_channels=1)
-    waveform = tf.squeeze(waveform, axis=-1)
-    frames = tf.signal.frame(waveform, sr * 3, sr // 2, pad_end=True)
-    return frames
-
-
 def get_carnatic_label(file_path):
     parts = tf.strings.split(input=file_path, sep=os.path.sep)
 
-    label1 = int(tf.strings.split(input=parts[7], sep='_')[1])  # Raag_id
-    label2 = int(tf.strings.split(input=parts[8], sep='_')[1])  # Swaras_set_id
-    label3 = int(tf.strings.split(input=parts[8], sep='_')[2])  # Melakarta_id
-    label4 = int(tf.strings.split(input=parts[8], sep='_')[3])  # aaroh_set_id
-    label5 = int(tf.strings.split(input=parts[8], sep='_')[3])  # avroh_set_id
-    label6 = int(tf.strings.split(input=parts[8], sep='_')[3])  # janak_id
+    label1 = int(tf.strings.split(input=parts[-2], sep='_')[1])  # Raag_id
+    label2 = int(tf.strings.split(input=parts[-2], sep='_')[2])  # Swaras_set_id
+    label3 = int(tf.strings.split(input=parts[-2], sep='_')[3])  # Melakarta_id
+    label4 = int(tf.strings.split(input=parts[-2], sep='_')[4])  # aaroh_set_id
+    label5 = int(tf.strings.split(input=parts[-2], sep='_')[5])  # avroh_set_id
+    label6 = int(tf.strings.split(input=parts[-2], sep='_')[6])  # janak_id
 
     return label1, label2, label3, label4, label5, label6
 
@@ -75,11 +66,11 @@ def get_hindustani_label(file_path):
 def get_regional_label(file_path):
     parts = tf.strings.split(input=file_path, sep=os.path.sep)
 
-    label1 = int(tf.strings.split(input=parts[7], sep='_')[1])  # Location_id
-    label2 = int(tf.strings.split(input=parts[8], sep='_')[1])  # Artist_id
-    label3 = int(tf.strings.split(input=parts[8], sep='_')[2])  # Gender_id
-    label4 = int(tf.strings.split(input=parts[8], sep='_')[3])  # Veteran
-    label5 = int(tf.strings.split(input=tf.strings.split(input=parts[9],
+    label1 = int(tf.strings.split(input=parts[-3], sep='_')[1])  # Location_id
+    label2 = int(tf.strings.split(input=parts[-2], sep='_')[1])  # Artist_id
+    label3 = int(tf.strings.split(input=parts[-2], sep='_')[2])  # Gender_id
+    label4 = int(tf.strings.split(input=parts[-2], sep='_')[3])  # Veteran
+    label5 = int(tf.strings.split(input=tf.strings.split(input=parts[-1],
                                                          sep='_')[1], sep='.')[0])  # No_of_artists
     return label1, label2, label3, label4, label5
 
@@ -107,9 +98,25 @@ def get_folk_label(file_path):
     return label1, label2, label3, label4, label5
 
 
+def get_waveform(file_path):
+    audio_binary = tf.io.read_file(file_path)
+    waveform, sr = tf.audio.decode_wav(contents=audio_binary,
+                                       desired_channels=1)
+    waveform = tf.squeeze(waveform, axis=-1)
+
+    # waveform = tf.linalg.normalize(waveform)
+    means = tf.math.reduce_mean(waveform)
+    std = tf.math.reduce_std(waveform)
+    waveform = (waveform - means) / (std + 1e-10)
+
+    frames = tf.signal.frame(waveform, sr * 3, sr // 2, pad_end=True)
+    return frames
+
+
 def get_waveform_and_label(file_path):
-    label = get_regional_label(file_path)
+    label = get_carnatic_label(file_path)
     waveform = get_waveform(file_path)
+
     # labels = tf.repeat(label, repeats=tf.shape(waveform)[0])
     labels = tf.tile(tf.expand_dims(label, axis=0), [tf.shape(waveform)[0], 1])
     return waveform, labels
@@ -130,7 +137,7 @@ def get_mel_spec(spec):
 
 
 def get_labels(y):
-    return y[0], y[1], y[2], y[3], y[4]
+    return y[0] #, y[1], y[2], y[3], y[4], y[5]
 
 
 def make_dataset_ds(filenames, batch_size):
