@@ -114,7 +114,7 @@ def get_waveform(file_path):
 
 
 def get_waveform_and_label(file_path):
-    label = get_carnatic_label(file_path)
+    label = get_folk_label(file_path)
     waveform = get_waveform(file_path)
 
     # labels = tf.repeat(label, repeats=tf.shape(waveform)[0])
@@ -137,7 +137,7 @@ def get_mel_spec(spec):
 
 
 def get_labels(y):
-    return y[0] #, y[1], y[2], y[3], y[4], y[5]
+    return y[0], y[3], y[4] #, y[3], y[4], y[5]
 
 
 def make_dataset_ds(filenames, batch_size):

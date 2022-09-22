@@ -20,11 +20,7 @@ tf.random.set_seed(seed)
 np.random.seed(seed)
 
 setup_gpu_state()
-snapshots_path = '/media/A/CarnaticSnapshots/1'
-
-
-def get_label(x, y):
-    return x, y[0]
+snapshots_path = '/mnt/A/FolkSnapshots/1/1'
 
 
 def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, base_path):
@@ -35,35 +31,34 @@ def main(dataset_nick_name, model_name, task, epochs, val_split, batch_size, bas
     dataset_path, outputs = get_dataset_info(base_path, dataset_nick_name)
     train_ds, val_ds = prepare_dataset(dataset_path, dataset_nick_name, val_split, batch_size)
     #
-    tf.data.experimental.save(train_ds, snapshots_path + '/Train')
-    tf.data.experimental.save(val_ds, snapshots_path + '/Val')
+    # tf.data.experimental.save(train_ds, snapshots_path + '/Train')
+    # tf.data.experimental.save(val_ds, snapshots_path + '/Val')
 
-    # train_ds = tf.data.experimental.load(snapshots_path + '/Train')
-    # val_ds = tf.data.experimental.load(snapshots_path + '/Val')
-
-    # train_ds = train_ds.map(map_func=get_label, num_parallel_calls=tf.data.AUTOTUNE)
-    # val_ds = val_ds.map(map_func=get_label, num_parallel_calls=tf.data.AUTOTUNE)
+    train_ds = tf.data.experimental.load(snapshots_path + '/Train')
+    val_ds = tf.data.experimental.load(snapshots_path + '/Val')
 
     # ds = val_ds.filter(lambda x, y: tf.reduce_any(tf.math.is_nan(x)))
     # print(len(list(ds.as_numpy_iterator())))
 
-    # model = get_model_func(model_name)
-    # model = model(input_shape, outputs[:1])
+    train_ds = train_ds.shuffle(buffer_size=256, reshuffle_each_iteration=True)
+
+    model = get_model_func(model_name)
+    model = model(input_shape, outputs[:1])
     # #
     # # # model.summary()
     # #
     # # # plot_model_diagram(model, model_plot_path)
     # # #
-    # compile_train_model(model, dataset_nick_name, model_name,
-    #                     train_ds, val_ds, model_save_path,
-    #                     tensorboard_logs_path, epochs)
+    compile_train_model(model, dataset_nick_name, model_name,
+                        train_ds, val_ds, model_save_path,
+                        tensorboard_logs_path, epochs)
 
 
 if __name__ == '__main__':
-    dataset = 'carnatic'
+    dataset = 'folk'
     model_name = 'baseline'
-    task = 'task1'
-    base_path = '/media/B/multitask_indian_music_classification/'
+    task = 'task1_1'
+    base_path = '/mnt/B/multitask_indian_music_classification/'
     epochs = 100
     batch_size = 256
     val_split = .2
